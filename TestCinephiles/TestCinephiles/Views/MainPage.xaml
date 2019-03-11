@@ -1,0 +1,78 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:prism="clr-namespace:Prism.Mvvm;assembly=Prism.Forms"
+             xmlns:b="clr-namespace:Prism.Behaviors;assembly=Prism.Forms"
+             prism:ViewModelLocator.AutowireViewModel="True"
+             x:Class="TestCinephiles.Views.MainPage"
+             xmlns:c="clr-namespace:TestCinephiles.Converters"
+             xmlns:ffimageloading="clr-namespace:FFImageLoading.Forms;assembly=FFImageLoading.Forms"
+             Title="{Binding Title}">
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <c:ItemVisibilityEventArgsConverter x:Key="ItemVisibilityEventArgsConverter" />
+            <c:ItemSelectedEventArgsConverter x:Key="ItemSelectedEventArgsConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+    <ContentPage.Behaviors>
+        <b:EventToCommandBehavior EventName="Appearing"
+                                  Command="{Binding LoadDataCommand}">
+        </b:EventToCommandBehavior>
+    </ContentPage.Behaviors>
+    <StackLayout HorizontalOptions="FillAndExpand">
+        <Entry x:Name="Search" Text="{Binding Search}" Placeholder="Search All Movies...">
+            <Entry.Behaviors>
+                <b:EventToCommandBehavior EventName="TextChanged"
+                                          Command="{Binding TextChangedCommand}"/>
+            </Entry.Behaviors>
+        </Entry>
+        <ListView ItemsSource="{Binding UpcomingMovie}"
+                      x:Name="UpcomingListView"
+                      CachingStrategy="RecycleElement"
+                      HasUnevenRows="True">
+            <ListView.Behaviors>
+                <b:EventToCommandBehavior EventName="ItemAppearing" 
+                                      Command="{Binding ItemAppearingCommand}"
+                                      EventArgsConverter="{StaticResource ItemVisibilityEventArgsConverter}" />
+
+                <b:EventToCommandBehavior EventName="ItemSelected" 
+                                      Command="{Binding ItemSelectedCommand}"
+                                      EventArgsConverter="{StaticResource ItemSelectedEventArgsConverter}" />
+            </ListView.Behaviors>
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <ViewCell>
+                        <StackLayout Orientation="Horizontal"
+                                         Margin="20"
+                                         HorizontalOptions="FillAndExpand">
+                            <StackLayout VerticalOptions="StartAndExpand" HorizontalOptions="Start">
+                                <ffimageloading:CachedImage x:Name="PosterImage"
+                                                                Source="{Binding BackdropPath, StringFormat='https://image.tmdb.org/t/p/w500{0:F0}'}"
+                                                                Aspect="AspectFill"
+                                                                LoadingPlaceholder="Loading_Movie.jpg"
+                                                                ErrorPlaceholder="noimage.gif"
+                                                                CacheDuration="12"/>
+                            </StackLayout>
+                            <StackLayout VerticalOptions="StartAndExpand" 
+                                         HorizontalOptions="StartAndExpand">
+                                <Label
+                                        Text="{Binding Title, StringFormat='Name: {0:F0}'}"
+                                        FontSize="Small"
+                                        ></Label>
+                                <Label
+                                        Text="{Binding Genres, StringFormat='Genres: {0:F0}'}"
+                                        FontSize="Small"
+                                        ></Label>
+                                <Label
+                                        Text="{Binding ReleaseDate, StringFormat='Release Date: {0:F0}'}"
+                                        FontSize="Small"
+                                        ></Label>
+
+                            </StackLayout>
+                        </StackLayout>
+                    </ViewCell>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+    </StackLayout>
+</ContentPage>
